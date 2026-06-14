@@ -19,6 +19,11 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags += "-std=c++17"
+                arguments += "-DBUILD_TESTING=OFF"
+                arguments += "-DCMAKE_SKIP_TESTS=ON"
+                arguments(
+                    "-DCMAKE_CROSSCOMPILING_EMULATOR="
+                )
             }
         }
     }
