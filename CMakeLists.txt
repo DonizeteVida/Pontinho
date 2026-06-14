@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
+
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
     GIT_TAG 3.1.0
@@ -13,6 +14,14 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
+FetchContent_Declare(yoga
+    GIT_REPOSITORY https://github.com/react/yoga.git
+    GIT_TAG v3.2.1
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+FetchContent_MakeAvailable(yoga)
+
 if(ANDROID)
     add_library(pontinho SHARED src/main.cpp)
     target_link_libraries(pontinho PRIVATE SFML::Main)
@@ -20,4 +29,9 @@ else()
     add_executable(pontinho src/main.cpp)
 endif()
 
-target_link_libraries(pontinho PRIVATE SFML::System SFML::Graphics)
+target_link_libraries(
+    pontinho 
+    PRIVATE
+    yogacore
+    SFML::System
+    SFML::Graphics)
