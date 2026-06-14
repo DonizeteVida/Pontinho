@@ -29,9 +29,14 @@ else()
     add_executable(pontinho src/main.cpp)
 endif()
 
+add_subdirectory(assets)
+add_subdirectory(widget)
+
 target_link_libraries(
     pontinho 
     PRIVATE
+    assets
+    widget
     yogacore
     SFML::System
     SFML::Graphics)

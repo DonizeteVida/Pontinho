@@ -6,48 +6,52 @@
 
 #include <yoga/Yoga.h>
 
-void calculateShape(YGNodeRef &node, sf::RectangleShape &shape)
-{
-	const auto left = YGNodeLayoutGetLeft(node);
-	const auto top = YGNodeLayoutGetTop(node);
-	const auto width = YGNodeLayoutGetWidth(node);
-	const auto height = YGNodeLayoutGetHeight(node);
+#include <assets/font.h>
 
-	shape.setPosition({left, top});
-	shape.setSize({width, height});
-}
+#include <WidgetContext.hpp>
+#include <Container.hpp>
+#include <Column.hpp>
+#include <Row.hpp>
+#include <Text.hpp>
+
+void printNodes(YGNodeRef node) {
+	auto count = YGNodeGetChildCount(node);
+
+	std::cout << "Begin: " << count << '\n';
+	for (int i = 0; i < count; i++) {
+		auto child = YGNodeGetChild(node, i);
+		printNodes(child);
+	}
+	std::cout << "End" << '\n';
+} 
 
 int main()
 {
+	sf::Font font(default_font_ttf, default_font_ttf_size);
 	sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Pontino");
 	window.setFramerateLimit(30);
 	window.setVerticalSyncEnabled(true);
 
-	sf::RectangleShape shape;
+	Pontinho::ContainerWidget root;
+	Pontinho::WidgetContext::PushParent(root.node);
 
-	YGNodeRef root = YGNodeNew();
-	YGNodeStyleSetFlexDirection(root, YGFlexDirectionRow);
+	Pontinho::Column([&] {
+		Pontinho::Column([&] {
+			Pontinho::Text(font, "B");
+			Pontinho::Text(font, "C");
+			Pontinho::Text(font, "D");
+		});
 
-	YGNodeRef child0 = YGNodeNew();
-	YGNodeStyleSetFlexDirection(child0, YGFlexDirectionRow);
-	YGNodeStyleSetFlexGrow(child0, 1.0f);
-	YGNodeInsertChild(root, child0, 0);
+		Pontinho::Column([&] {
+			Pontinho::Text(font, "E");
+			Pontinho::Text(font, "F");
+			Pontinho::Text(font, "G");
+		});
+	});
 
-	YGNodeRef child1 = YGNodeNew();
-	YGNodeStyleSetFlexGrow(child1, 1.0f);
-	YGNodeInsertChild(root, child1, 1);
+	printNodes(root.node);
 
-	YGNodeRef child0_1 = YGNodeNew();
-	YGNodeStyleSetFlexGrow(child0_1, 1.0f);
-	YGNodeInsertChild(child0, child0_1, 0);
-
-	YGNodeRef child0_2 = YGNodeNew();
-	YGNodeStyleSetFlexGrow(child0_2, 1.0f);
-	YGNodeInsertChild(child0, child0_2, 1);
-
-	YGNodeRef child0_3 = YGNodeNew();
-	YGNodeStyleSetFlexGrow(child0_3, 1.0f);
-	YGNodeInsertChild(child0, child0_3, 1);
+	assert(root.node == Pontinho::WidgetContext::Get());
 
 	while (window.isOpen())
 	{
@@ -63,33 +67,15 @@ int main()
 
 				window.setView(sf::View(sf::FloatRect({0, 0}, {(float)width, (float)height})));
 
-				YGNodeStyleSetWidth(root, width);
-				YGNodeStyleSetHeight(root, height);
-				YGNodeCalculateLayout(root, width, height, YGDirectionLTR);
+				root.SetWidth(width);
+				root.SetHeight(height);
+				YGNodeCalculateLayout(root.node, YGUndefined, YGUndefined, YGDirectionLTR);
 			}
 		}
 
 		window.clear(sf::Color::Black);
 
-		calculateShape(child0, shape);
-		shape.setFillColor(sf::Color::Red);
-		window.draw(shape);
-
-		calculateShape(child1, shape);
-		shape.setFillColor(sf::Color::Green);
-		window.draw(shape);
-
-		calculateShape(child0_1, shape);
-		shape.setFillColor(sf::Color::Blue);
-		window.draw(shape);
-
-		calculateShape(child0_2, shape);
-		shape.setFillColor(sf::Color::Yellow);
-		window.draw(shape);
-
-		calculateShape(child0_3, shape);
-		shape.setFillColor(sf::Color::Cyan);
-		window.draw(shape);
+		root.Draw(window);
 
 		window.display();
 	}
