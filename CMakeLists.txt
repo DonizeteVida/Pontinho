@@ -20,4 +20,4 @@ else()
     add_executable(pontinho src/main.cpp)
 endif()
 
-target_link_libraries(pontinho PRIVATE SFML::Graphics)
+target_link_libraries(pontinho PRIVATE SFML::System SFML::Graphics)
